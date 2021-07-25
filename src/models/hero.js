@@ -1,36 +1,43 @@
 const mongoose = require('../database');
+const {CIDADES, DESASTRES, TRAB_EQUIPE} =  require('../constants');
 
 // Schema para Hérois
 const HeroSchema = new mongoose.Schema({
 
     nomeReal: {
         type: String,
-        require: true,
+        required: true,
         
         // nome real é somente para uso interno.
         select: false,
     },
     codinome: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
     },
     desastres: [{
         type: String,
-        require: true,
+        enum: DESASTRES,
+        required: true,
     }],
     cidades: [{
         type: String,
-        require: true,
+        enum: CIDADES,
+        required: true,
     }],
     trabEquipe: {
         type: String,
-        enum: ['sim', 'nao', 'indiferente'],
+        enum: TRAB_EQUIPE,
         default: 'indiferente',
+        lowercase: true,
     },
-    CreatedAt: {
+    createdAt: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
+
+        // Como esse path é uma timestamp, ele não deve ser modificado uma vez criado.
+        immutable: true,
     }
 })
 
