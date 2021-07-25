@@ -1,10 +1,11 @@
 {
-  "name": "99-Hero",
+  "name": "99Hero",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app",
+    "dev": "nodemon src/app"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +14,8 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongoose": "^5.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }

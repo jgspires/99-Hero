@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('../database');
 
 // Schema para Hérois
 const HeroSchema = new mongoose.Schema({
@@ -13,6 +13,7 @@ const HeroSchema = new mongoose.Schema({
     codinome: {
         type: String,
         require: true,
+        unique: true,
     },
     desastres: [{
         type: String,
