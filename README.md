@@ -2,8 +2,9 @@
 
 ## About
 
-A simple Node.js and Express.js-based RESTful API that connects to a MongoDB database containing various superheroes.
-CRUD functions can be executed using this API (over a service like Postman) in order to create, remove, update and delete superheroes from an existing database following a predefined schema.
+A simple Node.js based RESTful API webserver that connects to a MongoDB database containing various superheroes.
+CRUD functions can be executed using this API in order to create, remove, update and delete superheroes from an existing database following a predefined schema.
+Disasters of one of the predefined types may also be announced in any of the predefined cities. When that happens, several superheroes that combat that disaster and work in that city will be returned as a response. The number of heroes depends on the type of disaster given and is slightly random.
 
 Database schemas are defined internally using Mongoose. MongoDB must be running locally for the webserver to work.
 
