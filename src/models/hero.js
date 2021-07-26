@@ -18,7 +18,7 @@ const HeroSchema = new mongoose.Schema({
     },
     desastres: [{
         type: String,
-        enum: DESASTRES,
+        enum: DESASTRES.map(({ nome }) => nome),
         required: true,
     }],
     cidades: [{

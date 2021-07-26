@@ -1,6 +1,6 @@
 const express = require('express');
 const Hero = require('../models/hero');
-const {CIDADES, DESASTRES, HTTP_OK, HTTP_CREATED, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_CONFLICT, HTTP_INT_SERVER_ERROR} =  require('../constants');
+const {CIDADES, DESASTRES, HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_CONFLICT, HTTP_INT_SERVER_ERROR, TRAB_EQUIPE} =  require('../constants');
 
 // Prepara o router para a definição de rotas.
 const router = express.Router();
@@ -30,13 +30,22 @@ const codinomeJaExiste  = async (codinome) => {
  */
 const validarHeroi = async (body) => {
     let error = "";
+    let nomeReal = body.nomeReal;
+    let codinome = body.codinome;
+    let nomeDesastres = DESASTRES.map(({ nome }) => nome);
+    nomeReal = nomeReal.trim().toLowerCase();
+    codinome = codinome.trim().toLowerCase();
 
+    if(nomeReal === codinome)
+        error = error.concat('Nome real precisa ser diferente do codinome. ');
     if(typeof body.nomeReal != "string")
         error = error.concat('Nome real precisa ser uma string. ');
     if(typeof body.codinome != "string")
         error = error.concat('Codinome precisa ser uma string. ');
+    if(!TRAB_EQUIPE.includes(body.trabEquipe))
+        error = error.concat(`TrabEquipe "${body.trabEquipe}" inválido. Use "sim", "nao" ou "indiferente". `);
     for(let i = 0; i < body.desastres.length; i++) {
-        if(DESASTRES.includes(body.desastres[i]) == false)
+        if(nomeDesastres.includes(body.desastres[i]) == false)
             error = error.concat(`Desastre: "${body.desastres[i]}" inválido. `);
     }
     for(let i = 0; i < body.cidades.length; i++) {
@@ -62,6 +71,22 @@ const deleteUndefProps = async (obj) => {
         }
     });
 };
+
+/**
+ * Retorna a quantidade de heróis necessária para um tipo de desastre determinado.
+ * @param  {Desastre} desastre O desastre anunciado.
+ * @return {Integer} A quantidade de heróis a ser alocada para o desastre provido ou zero caso o desastre não tenha sido encontrado.
+ */
+const qtdHeroisDesastre = async (desastre) => {
+    let nomeDesastres = DESASTRES.map(({nome}) => nome);
+
+    let index = nomeDesastres.indexOf(desastre);
+    if(index == -1)
+        return 0;
+    else {
+        return (Math.floor(Math.random() * (DESASTRES[index].qtdHerois[1] - DESASTRES[index].qtdHerois[0] + 1))) + DESASTRES[index].qtdHerois[0];
+    }
+}
 
 /** Definição de Endpoints e Rotas **/
 
@@ -93,7 +118,6 @@ router.post(COLLECTION, async (req, res) => {
 // Modificar um Herói a partir de seu codinome.
 router.put(COLLECTION, async (req, res) => {
     var atualCodinome = req.query.codinome;
-    var novoCodinome = req.body.codinome;
 
     try {
         if(atualCodinome === undefined)
@@ -114,7 +138,7 @@ router.put(COLLECTION, async (req, res) => {
         // Remove o nome real da resposta enviada, uma vez que é somente interno.
         hero.nomeReal = undefined;
 
-        return res.send();
+        return res.status(HTTP_NO_CONTENT).send();
     } catch (err) {
         return res.status(HTTP_INT_SERVER_ERROR).send({error: 'Falha no registro de herói: ' + err});
     }
@@ -127,6 +151,7 @@ router.get(COLLECTION, async (req, res) => {
         desastres: req.query.desastre,
         cidades: req.query.cidade,
     };
+    var nomeDesastres = DESASTRES.map(({ nome }) => nome);
 
     try {
         // Se houver codinome, busca somente um com aquele codinome.
@@ -144,7 +169,7 @@ router.get(COLLECTION, async (req, res) => {
             // "find" não perece funcionar com chaves undefined?
             deleteUndefProps(qParams);
 
-            if(qParams.desastres !== undefined && !DESASTRES.includes(qParams.desastres))
+            if(qParams.desastres !== undefined && !nomeDesastres.includes(qParams.desastres))
                 return res.status(HTTP_BAD_REQUEST).send({error: `Desastre inválido: "${qParams.desastres}"`})
 
             if(qParams.cidades !== undefined && !CIDADES.includes(qParams.cidades))
@@ -178,6 +203,39 @@ router.delete(COLLECTION, async (req, res) => {
         return res.send({hero});
     } catch (err) {
         return res.status(HTTP_INT_SERVER_ERROR).send({error: 'Falha ao deletar herói: ' + err});
+    }
+});
+
+// Nick Fury - Buscar heróis para anúncio de desastre.
+router.get(`${COLLECTION}/anuncio`, async (req, res) => {
+    var qParams = {
+        desastre: req.query.desastre,
+        cidade: req.query.cidade,
+    };
+    // Mapeia os nomes dos desastres em um vetor
+    var nomeDesastres = DESASTRES.map(({ nome }) => nome);
+
+    try {
+        // Ambos local e desastre precisam ser recebidos
+        if(qParams.desastre == undefined || qParams.cidade == undefined)
+            return res.status(HTTP_BAD_REQUEST).send({error: "Favor inserir um desastre e um local."});
+        
+        // E desastre precisa ser válido
+        if(!nomeDesastres.includes(qParams.desastre))
+            return res.status(HTTP_BAD_REQUEST).send({error: `Desastre inválido: "${qParams.desastres}"`})
+
+        // Retorna uma quantidade aleatória de heróis baseada em qual desastre fora anunciado.
+        var qtdHerois = await qtdHeroisDesastre(qParams.desastre);
+
+        // Agrega os resultados.
+        const heroes = await Hero.aggregate([
+            { $match: { desastres: qParams.desastre, cidades: qParams.cidade, trabEquipe: { $ne: "nao"} } },
+            { $limit: qtdHerois}
+          ])
+
+        return res.send({heroes});
+    } catch (err) {
+        return res.status(HTTP_INT_SERVER_ERROR).send({error: 'Falha ao buscar heróis para desastre: ' + err});
     }
 });
 
