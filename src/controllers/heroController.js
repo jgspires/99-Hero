@@ -154,6 +154,10 @@ router.get(COLLECTION, async (req, res) => {
     var nomeDesastres = DESASTRES.map(({ nome }) => nome);
 
     try {
+        // Deleta as chaves undefined dos parâmetros da query.
+        // "find" não perece funcionar com chaves undefined?
+        deleteUndefProps(qParams);
+
         // Se houver codinome, busca somente um com aquele codinome.
         if(qParams.codinome) {
             const hero = await Hero.findOne(qParams);
@@ -165,9 +169,6 @@ router.get(COLLECTION, async (req, res) => {
         }
         // Como não há codinome, busca todos de acordo com os parâmetros.
         else {
-            // Deleta as chaves undefined dos parâmetros da query.
-            // "find" não perece funcionar com chaves undefined?
-            deleteUndefProps(qParams);
 
             if(qParams.desastres !== undefined && !nomeDesastres.includes(qParams.desastres))
                 return res.status(HTTP_BAD_REQUEST).send({error: `Desastre inválido: "${qParams.desastres}"`})
