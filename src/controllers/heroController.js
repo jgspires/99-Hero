@@ -225,13 +225,28 @@ router.get(`${COLLECTION}/anuncio`, async (req, res) => {
             return res.status(HTTP_BAD_REQUEST).send({error: `Desastre inválido: "${qParams.desastres}"`})
 
         // Retorna uma quantidade aleatória de heróis baseada em qual desastre fora anunciado.
-        var qtdHerois = await qtdHeroisDesastre(qParams.desastre);
+        var qtdNecessaria = await qtdHeroisDesastre(qParams.desastre);
+        var qtdAtual = 0;
 
         // Agrega os resultados.
-        const heroes = await Hero.aggregate([
+        var heroes = await Hero.aggregate([
             { $match: { desastres: qParams.desastre, cidades: qParams.cidade, trabEquipe: { $ne: "nao"} } },
-            { $limit: qtdHerois}
-          ])
+            { $limit: qtdNecessaria},
+            { $project: {nomeReal: 0} } // Nome real não pode ser exibido.
+        ])
+        
+        qtdAtual += heroes.length;
+
+        // Adiciona o restante dos heróis, mesmo que ele não gostem de trabalhar em equipe, se não houver heróis suficientes p/ o desastre.
+        if(qtdAtual < qtdNecessaria) {
+        heroes = heroes.concat(
+                await Hero.aggregate([
+                    { $match: { desastres: qParams.desastre, cidades: qParams.cidade, trabEquipe: { $eq: "nao"} } },
+                    { $limit: (qtdNecessaria-qtdAtual)},
+                    { $project: {nomeReal: 0} } // Nome real não pode ser exibido.
+                ])
+            )
+        }
 
         return res.send({heroes});
     } catch (err) {
