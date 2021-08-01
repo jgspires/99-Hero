@@ -13,7 +13,8 @@ Database schemas are defined internally using Mongoose. MongoDB must be running 
 From the application's root folder, execute the following commands using the CLI of your choice:
 * npm i
 * npm run start
-* Consume the application using the software of your choice, such as Postman.
+
+Then, consume the application using the software of your choice, such as Postman.
 
 ## Considerations
 
