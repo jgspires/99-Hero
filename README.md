@@ -44,7 +44,7 @@ Multiple parameters are concatenated with "&":
 {{base}}/{{store}}/heroes?codinome=Wolverine&desastre=assalto a banco
 ```
 
-## Operation Structure
+## Operations
 
 ### POSTs:
 
