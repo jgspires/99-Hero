@@ -42,8 +42,6 @@ const validarHeroi = async (body) => {
         error = error.concat('Nome real precisa ser uma string. ');
     if(typeof body.codinome != "string")
         error = error.concat('Codinome precisa ser uma string. ');
-    if(!TRAB_EQUIPE.includes(body.trabEquipe))
-        error = error.concat(`TrabEquipe "${body.trabEquipe}" inválido. Use "sim", "nao" ou "indiferente". `);
     for(let i = 0; i < body.desastres.length; i++) {
         if(nomeDesastres.includes(body.desastres[i]) == false)
             error = error.concat(`Desastre: "${body.desastres[i]}" inválido. `);
