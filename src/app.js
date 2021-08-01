@@ -18,7 +18,4 @@ app.use(reqLogger);
 // Chama o controller com a aplicação express como parâmetro.
 require('./controllers/heroController')(app);
 
-// Controller de teste na rota base '/' para lançar um "Olá Mundo".
-require('./controllers/landingController')(app);
-
 app.listen(PORT, () => {console.log(`Servidor iniciado na porta ${PORT}.`)});
