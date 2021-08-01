@@ -8,6 +8,13 @@ Disasters of one of the predefined types may also be announced in any of the pre
 
 Database schemas are defined internally using Mongoose. MongoDB must be running locally for the webserver to work.
 
+## How to Use
+
+From the application's root folder, execute the following commands using the CLI of your choice:
+* npm i
+* npm run start
+* Consume the application using the software of your choice, such as Postman.
+
 ## Considerations
 
 Hero CRUD operations may be performed by accessing "99Hero/heroes" using either POST, GET, PUT or DELETE.
