@@ -11,7 +11,7 @@ Database schemas are defined internally using Mongoose. MongoDB must be running 
 ## Considerations
 
 Hero CRUD operations may be performed by accessing "99Hero/heroes" using either POST, GET, PUT or DELETE.
-For now, please see source code for any potential parameters and hero schema structure.
+Operation structure and parameters are provided further into this documentation.
 
 ### Please consider the following variables and valid values:
 
