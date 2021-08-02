@@ -10,8 +10,8 @@ Database schemas are defined internally using Mongoose. MongoDB must be running 
 
 ## How to Use
 
-First, make sure you have Node.js, MongoDB and MongoDB database tools installed.
-Second, restore the MongoDB database located in the "dump" folder using "mongorestore". To do that simply navigate to where the "dump" folder is located, run the CLI of your preference and type "mongorestore dump/".
+* Make sure you have Node.js, MongoDB and MongoDB database tools installed.
+* After that, restore the MongoDB database located in the "dump" folder using "mongorestore". To do that simply navigate to where the "dump" folder is located, run the CLI of your preference and type "mongorestore dump/".
 
 Then, from the application's root folder, execute the following commands using the CLI of your choice:
 * npm i
